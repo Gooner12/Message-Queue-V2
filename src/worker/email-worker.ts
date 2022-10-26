@@ -21,12 +21,14 @@ const sendEmailJob = async (job: Job) => {
       rejectUnauthorized: false,
     },
   });
+  await job.updateProgress(50);
 
   // send mail with defined transport object
   let info = await transporter.sendMail(job.data);
 
   console.log("Message sent: %s", info.messageId);
 
+  await job.updateProgress(100); // stating that the job has been 100% completed.
   return nodemailer.getTestMessageUrl(info);
 };
 

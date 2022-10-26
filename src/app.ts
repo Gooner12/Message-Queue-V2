@@ -1,7 +1,6 @@
 import express from "express";
 import { expressRouter } from "./routes/work-route";
 import { serverAdapter } from "./producer/job-producer";
-// import { serverAdapter } from "./queues/email-queue";
 
 const app: express.Application = express();
 app.use(express.json());
