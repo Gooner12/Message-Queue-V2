@@ -1,7 +1,5 @@
 import { Request, Response } from "express";
 import { addJob } from "../producer/job-producer";
-// import { addJob } from "../queues/email-queue";
-// import { addJob } from "../queues/queue-operation";
 
 export const sendEmail = async (req: Request, res: Response) => {
   const { msg, ...otherInfo } = req.body;

@@ -11,8 +11,6 @@ type Request = {
   msg: string;
 };
 
-// const emailQueue = new Queue(queueName, { connection });
-
 // for visualising emailQueue in bull board ui
 const serverAdapter = new ExpressAdapter();
 serverAdapter.setBasePath("/admin/queues");
