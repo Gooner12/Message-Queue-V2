@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node dest/app.js",
     "dev": "nodemon --config nodemon.json src/app.ts",
-    "build": "tsc -p ."
+    "build": "tsc -p .",
+    "monitor": "node -r ts-node/register --inspect src/app.ts"
   },
   "keywords": [],
   "author": "",

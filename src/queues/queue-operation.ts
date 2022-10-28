@@ -10,7 +10,7 @@ const emailWorkerFirst = new Worker(
   `${__dirname}/../worker/email-worker.ts`,
   {
     connection,
-    concurrency: 1, // the concurrency determines the no.of jobs processed by a worker at a time
+    concurrency: 8, // the concurrency determines the no.of jobs processed by a worker at a time
   }
 );
 
@@ -19,7 +19,7 @@ const emailWorkerSecond = new Worker(
   `${__dirname}/../worker/email-worker.ts`,
   {
     connection,
-    concurrency: 10, // allowing 10 jobs to be processed in parallel
+    concurrency: 15, // allowing 10 jobs to be processed in parallel
   }
 );
 
