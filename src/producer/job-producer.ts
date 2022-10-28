@@ -27,7 +27,7 @@ export const addJob = async (data: Request) => {
     priority: 1,
     removeOnComplete: { 
       age: 3600, 
-      count: 40 
+      count: 20 
     }
   });
 };

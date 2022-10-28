@@ -1,16 +1,22 @@
-import { Worker, Queue } from "bullmq";
+import { Worker, Queue, QueueEvents } from "bullmq";
 import { queueName } from "../utils/process-constants";
 import { connection } from "../config/redis-credentials";
 import { Job } from "bullmq";
 
+type WorkNode = {
+  worker: Worker;
+  name: string
+}
+
 export const emailQueue = new Queue(queueName, { connection });
+const queueEvents = new QueueEvents(queueName, { connection });
 
 const emailWorkerFirst = new Worker(
   queueName,
   `${__dirname}/../worker/email-worker.ts`,
   {
     connection,
-    concurrency: 8, // the concurrency determines the no.of jobs processed by a worker at a time
+    concurrency: 8, 
   }
 );
 
@@ -19,46 +25,37 @@ const emailWorkerSecond = new Worker(
   `${__dirname}/../worker/email-worker.ts`,
   {
     connection,
-    concurrency: 15, // allowing 10 jobs to be processed in parallel
+    concurrency: 15, 
   }
 );
 
 // checking which worker did the job
-emailWorkerFirst.on("completed", async (job: Job, result: any) => {
-  console.log("Completed by first worker");
-  // await emailWorkerFirst.close(); // closing the worker after all the job it is working on is finished.
-  //  Note: the closing of worker connection depends on the completion of no. of job it takes. In this case, it is determined by the concurrency
-});
+const eventListener = (workerObject: WorkNode) => {
+  workerObject.worker.on("completed", async (job: Job, result: any) => {
+    console.log(`Completed by ${workerObject.name} worker.`);
+    if (workerObject.name === "first") {
+      await workerObject.worker.close();
+    }
+  });
+}
 
-emailWorkerSecond.on("completed", async (job: Job, result: any) => {
-  console.log("Completed by second worker");
-});
+eventListener({worker: emailWorkerFirst, name: "first"});
+eventListener({worker: emailWorkerSecond, name: "second"});
 
-// handling the error from the events to prevent node raising an unhandled exception and exiting the process.
+// handling the error from the events to prevent node from raising an unhandled exception and exiting the process.
 //  Otherwise, the worker may stop processing remaining jobs when error is emitted
-emailWorkerFirst.on("error", (err) => {
-  console.log(err);
+queueEvents.on("error", (error) => {
+  throw new Error(error.message);
 });
 
-emailWorkerSecond.on("error", (err) => {
-  console.log(err);
-});
 
 // reporting progress
-emailWorkerFirst.on("progress", (job: Job, progress: number | object) => {
-  if (progress == 50) {
+queueEvents.on("progress", (args: {jobId: string, data: number | object}) => {
+  if (args.data == 50) {
     console.log("Finalising the email sending process");
   }
-  if (progress == 100) {
+  if (args.data == 100) {
     console.log("Completed the send process");
   }
 });
 
-emailWorkerSecond.on("progress", (job: Job, progress: number | object) => {
-  if (progress == 50) {
-    console.log("Finalising the email sending process");
-  }
-  if (progress == 100) {
-    console.log("Completed the send process");
-  }
-});

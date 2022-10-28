@@ -20,8 +20,6 @@ const sendEmailJob = async (job: Job) => {
   await job.updateProgress(50);
   let info = await transporter.sendMail(job.data);
 
-  console.log("Message sent: %s", info.messageId);
-
   await job.updateProgress(100); 
   return nodemailer.getTestMessageUrl(info);
 };
