@@ -25,12 +25,11 @@ export const addJob = async (data: Request) => {
     attempts: 5,
     delay: 5000,
     priority: 1,
-    removeOnComplete: { // this will influence the number of jobs in a queue after completion. We can see its effect in the bull mq adaptor
-      age: 3600, // keep for an hour
-      count: 20 // only keep a max of 20 jobs
+    removeOnComplete: { 
+      age: 3600, 
+      count: 20 
     }
   });
-  // console.log("Done");
 };
 
 export { serverAdapter };
